@@ -5,14 +5,17 @@ module PPP
     end
 
     def parsed_line_item
-      {line_number: line_number,
-       item_number: item_number,
-       description: description,
-       quantity:    quantity,
-       unit_price:  unit_price}
+      {
+        line_number: line_number,
+        item_number: item_number,
+        description: description,
+        quantity:    quantity,
+        unit_price:  unit_price
+      }
     end
 
-  private
+    private
+
     def line_number
       @line_item.first.to_i
     end

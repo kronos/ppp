@@ -10,20 +10,23 @@ module PPP
     end
 
     def parsed_order
-      {confirmed_on: confirmed_on,
-       vendor_name:  vendor_name,
-       order_number: order_number,
-       status:       status,
-       po_number:    po_number,
-       line_items:   line_items,
-       total:        total}
+      {
+        confirmed_on: confirmed_on,
+        vendor_name:  vendor_name,
+        order_number: order_number,
+        status:       status,
+        po_number:    po_number,
+        line_items:   line_items,
+        total:        total
+      }
     rescue TypeError
-      raise InvalidReceiptFormat.new
+      raise InvalidReceiptFormat
     end
 
-  private
+    private
+
     def confirmed_on
-      DateTime.strptime(raw_confirmed_on, "%d/%m/%y %H:%M")
+      DateTime.strptime(raw_confirmed_on, '%d/%m/%y %H:%M')
     end
 
     def vendor_name

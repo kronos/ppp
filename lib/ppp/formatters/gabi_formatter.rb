@@ -9,11 +9,13 @@ module PPP
       @hash.each do |k, v|
         case v
         when DateTime
-          result[k] = "<#{v.class.to_s}> [#{v.strftime("%d/%m/%y %H:%M")}]"
+          result[k] = "<#{v.class}> [#{v.strftime('%d/%m/%y %H:%M')}]"
         when Array
-          result["#{k} <#{v.class.to_s}>"] = v.map {|e| GabiFormatter.new(e).formatted_text }
+          result["#{k} <#{v.class}>"] = v.map do |e|
+            GabiFormatter.new(e).formatted_text
+          end
         else
-          result[k] = "<#{v.class.to_s}> #{v}"
+          result[k] = "<#{v.class}> #{v}"
         end
       end
 

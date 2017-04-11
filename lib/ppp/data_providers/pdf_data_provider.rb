@@ -7,7 +7,7 @@ module PPP
     end
 
     def text
-      @pdf_file.pages.map {|p| p.text}.join("\n\n")
+      @pdf_file.pages.map(&:text).join("\n\n")
     end
   end
 end
