@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 $LOAD_PATH << './lib'
+
 require 'ppp'
 require 'json'
 
@@ -19,7 +20,7 @@ begin
   text  = PPP::PDFDataProvider.new(ARGV[0]).text
   order = PPP::OrderConfirmationParser.new(text).parsed_order
   puts PPP::GabiFormatter.new(order).formatted_text.to_json
-rescue PPP::OrderConfirmationParser::InvalidReceiptFormat
+rescue PPP::OrderConfirmationParser::UnknownReceiptFormat
   puts 'Error: invalid receipt format'
   exit(1)
 end

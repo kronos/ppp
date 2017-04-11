@@ -3,13 +3,15 @@ require 'time'
 
 module PPP
   class OrderConfirmationParser
-    class InvalidReceiptFormat < TypeError; end
+    class UnknownReceiptFormat < TypeError; end
 
     def initialize(text)
       @text = text
     end
 
     def parsed_order
+      @counter = 0
+
       {
         confirmed_on: confirmed_on,
         vendor_name:  vendor_name,
@@ -19,8 +21,8 @@ module PPP
         line_items:   line_items,
         total:        total
       }
-    rescue TypeError
-      raise InvalidReceiptFormat
+    rescue StandardError
+      raise UnknownReceiptFormat
     end
 
     private
@@ -30,19 +32,19 @@ module PPP
     end
 
     def vendor_name
-      @text.scan(/PAGE\s\d+\n\n(.+)\n\nCUSTOMER\sNAME/).flatten.first
+      retrieve_data("\n\n", "\n\n")
     end
 
     def order_number
-      @text.scan(/ORDER\sNUMBER\s:\s(\d+)$/).flatten.first
+      retrieve_data('ORDER NUMBER : ', "\n").to_i
     end
 
     def status
-      @text.scan(/STATUS\s:\s(\S+)$/).flatten.first.downcase
+      retrieve_data('STATUS : ', "\n").downcase
     end
 
     def po_number
-      @text.scan(/^PURCHASE\sORDER\sNUMBER\s:\s(\S+)$/).flatten.first.downcase
+      retrieve_data('ORDER NUMBER : ', "\n")
     end
 
     def line_items
@@ -50,15 +52,26 @@ module PPP
     end
 
     def total
-      @text.scan(/TOTAL\sQTY\s:\s+\d+\sNET\s+([0-9\.]+)$/).flatten.first.to_f
+      total_start  = @text.index(/\d+\.\d+$/, @counter)
+      total_finish = @text.index("\n\n", total_start)
+      @text[total_start...total_finish].to_f
     end
 
     def raw_confirmed_on
-      @text.scan(/([\/0-9]+\s[0-9:]+)\s+ORDER\sDETAIL\sSUMMARY/).flatten.first
+      idx = @text.index(%r{^\d{2}\/\d{2}\/\d{2}}, @counter)
+      @counter = idx + 14
+      @text[idx...@counter]
     end
 
     def raw_line_items
-      @text.scan(/----------\n(.+)----------\nTOTAL\sLINES/m).flatten.first
+      retrieve_data("----------\n", '-------').strip
+    end
+
+    def retrieve_data(from, to)
+      start  = @text.index(from, @counter) + from.length
+      finish = @text.index(to, start)
+      @counter = finish + to.length
+      @text[start...finish]
     end
   end
 end
