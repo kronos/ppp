@@ -3,7 +3,7 @@ $: << "./lib"
 require "ppp"
 require "json"
 
-USAGE = "Usage: ruby script.rb file_name.pdf"
+USAGE = "Usage: ./script.rb file_name.pdf"
 
 if ARGV.empty?
   puts USAGE
